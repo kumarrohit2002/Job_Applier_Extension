@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rohit's Job Applier</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Job Applier <span>PRO</span></h1>
+      <div class="header-actions">
+        <a href="../src/dashboard/index.html" target="_blank" class="dashboard-link">Open Dashboard ↗</a>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="setup">Setup</button>
+        <button class="tab-btn" data-tab="scraper">Scraper</button>
+        <button class="tab-btn" data-tab="results">Results</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Setup Tab -->
+      <section id="setup" class="tab-content active">
+        <div class="input-group">
+          <label for="role">Target Role</label>
+          <input type="text" id="role" placeholder="e.g. Full Stack Developer">
+        </div>
+        <div class="input-group">
+          <label for="skills">Skills</label>
+          <input type="text" id="skills" placeholder="e.g. Next.js, MERN, React">
+        </div>
+        <div class="input-group">
+          <label for="template">Email Template</label>
+          <div class="helper-text">Use {job_title} and {company} as placeholders.</div>
+          <textarea id="template" rows="5" placeholder="Enter your custom message here..."></textarea>
+        </div>
+
+        <!-- AI Config Section -->
+        <div class="ai-config-group" style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 15px;">
+          <div class="input-group">
+            <label for="ai-provider">AI Provider</label>
+            <select id="ai-provider" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: white;">
+              <option value="gemini">Local AI (Gemini Nano)</option>
+              <option value="openai">Cloud AI (ChatGPT)</option>
+            </select>
+          </div>
+          <div id="openai-settings" class="hidden">
+            <div class="input-group">
+              <label for="openai-key">OpenAI API Key</label>
+              <input type="password" id="openai-key" placeholder="sk-...">
+            </div>
+          </div>
+        </div>
+
+        <button id="save-settings" class="primary-btn">Save Configuration</button>
+      </section>
+
+      <!-- Scraper Tab -->
+      <section id="scraper" class="tab-content">
+        <div class="status-card">
+          <div class="status-icon">🚀</div>
+          <div class="status-info">
+            <h3>Ready to Launch</h3>
+            <p>Enter role & skills in Setup first, then click below to start scraping LinkedIn.</p>
+          </div>
+        </div>
+        <button id="start-search" class="primary-btn">Start Search & Scrape</button>
+        <div id="scraping-progress" class="progress-bar-container hidden">
+          <div class="progress-bar"></div>
+          <div class="live-status" style="font-size: 0.8rem; color: var(--primary); margin-top: 5px; font-weight: 600;">Initializing AI...</div>
+          <p>Posts Analyzed: <span id="found-count">0</span></p>
+        </div>
+      </section>
+
+      <!-- Results Tab -->
+      <section id="results" class="tab-content">
+        <div class="results-header">
+           <button id="clear-leads" class="danger-btn">Clear All Results</button>
+        </div>
+        <div class="table-container">
+          <table id="results-table">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Email</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Results populated here -->
+            </tbody>
+          </table>
+          <div id="no-results" class="empty-state">
+            No leads found yet. Start scraping!
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Developed for <span>Rohit Kumar</span></p>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

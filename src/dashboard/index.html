@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Applier PRO | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --accent-primary: #38bdf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --status-new: #38bdf8;
+            --status-applied: #fbbf24;
+            --status-replied: #4ade80;
+            --status-rejected: #f87171;
+            --border: #334155;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-primary); color: var(--text-primary); display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        aside { width: 260px; background: var(--bg-secondary); border-right: 1px solid var(--border); padding: 2rem 1.5rem; display: flex; flex-direction: column; }
+        .logo { font-size: 1.5rem; font-weight: 600; margin-bottom: 3rem; color: var(--accent-primary); display: flex; align-items: center; gap: 0.5rem; }
+        .logo span { background: var(--accent-primary); color: var(--bg-primary); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        
+        nav { flex: 1; }
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; border-radius: 8px; color: var(--text-secondary); text-decoration: none; margin-bottom: 0.5rem; transition: 0.3s; cursor: pointer; }
+        .nav-item.active { background: var(--bg-primary); color: var(--accent-primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .nav-item:hover:not(.active) { background: rgba(56, 189, 248, 0.1); color: var(--text-primary); }
+
+        /* Main Content */
+        main { flex: 1; padding: 3rem; overflow-y: auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+        .stat-card { background: var(--bg-secondary); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); }
+        .stat-card h3 { color: var(--text-secondary); font-size: 0.9rem; font-weight: 400; margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 2rem; font-weight: 600; }
+
+        /* Leads Table */
+        .card { background: var(--bg-secondary); border-radius: 16px; border: 1px solid var(--border); padding: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 1rem; color: var(--text-secondary); font-weight: 400; font-size: 0.9rem; border-bottom: 1px solid var(--border); }
+        td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        
+        .status-badge { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: capitalize; }
+        .status-new { background: rgba(56, 189, 248, 0.1); color: var(--status-new); }
+        .status-applied { background: rgba(251, 191, 36, 0.1); color: var(--status-applied); }
+        .status-replied { background: rgba(74, 222, 128, 0.1); color: var(--status-replied); }
+
+        .btn { padding: 0.6rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.3s; font-family: inherit; }
+        .btn-primary { background: var(--accent-primary); color: var(--bg-primary); }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-primary); }
+        .btn-outline:hover { background: var(--border); }
+
+        .empty-state { text-align: center; padding: 4rem; color: var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <aside>
+        <div class="logo">JobApplier <span>PRO</span></div>
+        <nav>
+            <div class="nav-item active" data-view="leads">💼 All Leads</div>
+            <div class="nav-item" data-view="automation">🚀 Automation Settings</div>
+            <div class="nav-item" data-view="analytics">📈 Analytics</div>
+        </nav>
+        <div class="footer">
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">v2.0 AI Powered</p>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <h1>Lead Management</h1>
+            <div class="actions">
+                <button class="btn btn-outline" id="export-btn">Export CSV</button>
+            </div>
+        </header>
+
+        <section class="stats">
+            <div class="stat-card">
+                <h3>Total Leads</h3>
+                <div class="value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Applied</h3>
+                <div class="value" id="stat-applied">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Interviews</h3>
+                <div class="value" id="stat-interviews">0</div>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-header">
+                <h2>Recent Leads</h2>
+            </div>
+            <div id="leads-container">
+                <table id="leads-table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Leads injected here -->
+                    </tbody>
+                </table>
+                <div id="no-leads" class="empty-state">
+                    No leads found yet. Start the automation to get started!
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="dashboard.js" type="module"></script>
+</body>
+</html>
