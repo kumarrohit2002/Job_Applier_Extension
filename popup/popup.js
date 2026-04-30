@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabContents = document.querySelectorAll('.tab-content');
   const saveBtn = document.getElementById('save-settings');
   const startBtn = document.getElementById('start-search');
+  const stopBtn = document.getElementById('stop-search');
   const clearBtn = document.getElementById('clear-leads');
   const resultsTable = document.querySelector('#results-table tbody');
   const noResults = document.getElementById('no-results');
@@ -61,6 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.sendMessage({ action: 'startScraping', role, skills });
   });
 
+  // Stop Scraping
+  stopBtn.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ action: 'stopScraping' });
+    setScrapingUI(false);
+  });
+
   // Clear Leads
   clearBtn.addEventListener('click', () => {
     if (confirm('Are you sure you want to clear all results?')) {
@@ -74,10 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function setScrapingUI(isScraping) {
     if (isScraping) {
       progressBar.classList.remove('hidden');
+      stopBtn.classList.remove('hidden');
       startBtn.disabled = true;
       startBtn.textContent = 'Scraping...';
     } else {
       progressBar.classList.add('hidden');
+      stopBtn.classList.add('hidden');
       startBtn.disabled = false;
       startBtn.textContent = 'Start Search & Scrape';
     }
@@ -104,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     leads.forEach((lead, index) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
+        <td style="text-align: center; color: var(--primary); font-weight: bold;">${index + 1}</td>
         <td>${lead.company || 'Direct'}</td>
         <td>${lead.title || 'Lead'}</td>
         <td style="word-break: break-all;">${lead.email}</td>

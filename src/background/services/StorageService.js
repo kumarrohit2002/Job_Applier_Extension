@@ -6,10 +6,35 @@ export class StorageService {
     this.DEFAULT_KEYS = {
       leads: [],
       settings: {
-        role: '',
-        skills: '',
-        template: '',
-        userProfile: {}
+        role: 'Full Stack Developer',
+        skills: 'Next.js, MERN stack, React.js, Tailwind CSS, Node.js, Express.js, MongoDB, PostgreSQL',
+        template: `Subject: Application for {job_title} - Rohit Kumar
+
+Dear Hiring Team at {company},
+
+I am Rohit Kumar, a Full Stack Developer with significant experience in building scalable web applications using Next.js and the MERN stack. I noticed the {job_title} opening at {company} and believe my technical background makes me a strong candidate.
+
+My Expertise:
+• Frontend: Next.js, React.js, TypeScript, Tailwind CSS
+• Backend: Node.js, Express.js, PostgreSQL, MongoDB
+• Key Projects: Built 'Tastico' (culinary platform) and 'PGHunter.in' (student accommodation) with secure auth and payment integration.
+• Experience: Currently interning at VisionTech Group, optimizing EMS and official websites.
+
+I am a quick learner and a hard worker who thrives in fast-paced environments. I look forward to the possibility of discussing how I can contribute to {company}.
+
+Best regards,
+Rohit Kumar
+Email: rohitranjanrrsingh@gmail.com
+LinkedIn: linkedin.com/in/rohit-full-stack-dev
+GitHub: github.com/kumarrohit2002
+Mobile: +91-7903769260`,
+        userProfile: {
+          name: 'Rohit Kumar',
+          email: 'rohitranjanrrsingh@gmail.com',
+          phone: '+91-7903769260',
+          linkedin: 'https://www.linkedin.com/in/rohit-full-stack-dev',
+          github: 'https://github.com/kumarrohit2002'
+        }
       },
       stats: {
         totalScraped: 0,
