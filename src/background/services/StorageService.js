@@ -7,7 +7,7 @@ export class StorageService {
       leads: [],
       settings: {
         role: 'Full Stack Developer',
-        skills: 'Next.js, MERN stack, React.js, Tailwind CSS, Node.js, Express.js, MongoDB, PostgreSQL',
+        skills: 'MERN Stack',
         template: `Subject: Application for {job_title} - Rohit Kumar
 
 Dear Hiring Team at {company},

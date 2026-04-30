@@ -24,7 +24,7 @@ Mobile: +91-7903769260`;
     if (!data.role || !data.template) {
       chrome.storage.local.set({
         role: 'Full Stack Developer',
-        skills: 'Next.js, MERN stack, React.js, Tailwind CSS',
+        skills: 'softwa',
         template: defaultTemplate
       });
     }
@@ -34,7 +34,8 @@ Mobile: +91-7903769260`;
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'startScraping') {
     const { role, skills } = message;
-    const query = encodeURIComponent(`${role} ${skills}`);
+    const enhancedSkills = skills.toLowerCase().includes('hire') ? skills : `${skills} hire`;
+    const query = encodeURIComponent(`${role} ${enhancedSkills}`);
     const url = `https://www.linkedin.com/search/results/content/?keywords=${query}&origin=FACETED_SEARCH&datePosted=%5B%22past-week%22%5D`;
     
     chrome.storage.local.set({ isScraping: true, currentRole: role });
