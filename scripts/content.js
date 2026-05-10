@@ -201,6 +201,9 @@
 
       console.log(`[Job Applier PRO] Scanning ${containers.length} potential containers.`);
 
+      const settings = await new Promise(r => chrome.storage.local.get(['useAI'], r));
+      const useAI = settings.useAI;
+
       for (const container of containers) {
         const text = container.innerText || '';
         if (text.length < 50) continue; // Skip tiny elements
@@ -212,9 +215,9 @@
         if (matches) {
           injectResultUI(container); // Mark it found something
 
-          matches.forEach(email => {
+          for (const email of matches) {
             const lowerEmail = email.toLowerCase().trim();
-            if (seenEmailsInWave.has(lowerEmail)) return;
+            if (seenEmailsInWave.has(lowerEmail)) continue;
             seenEmailsInWave.add(lowerEmail);
 
             // Visual feedback
@@ -228,8 +231,31 @@
             injectResultUI(container, lowerEmail, status);
 
             if (!existing) {
-              const company = extractCompany(container, lowerEmail);
-              const title = guessJobTitle(text, searchedRole);
+              let company = extractCompany(container, lowerEmail);
+              let title = guessJobTitle(text, searchedRole);
+
+              if (useAI && chrome.runtime?.id) {
+                updateBanner(`AI Analyzing lead: ${lowerEmail}...`);
+                try {
+                  const response = await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => reject(new Error('AI Analysis Timeout')), 10000);
+                    chrome.runtime.sendMessage({ action: 'analyzePost', text: text }, (res) => {
+                      clearTimeout(timeout);
+                      if (chrome.runtime.lastError) reject(new Error(chrome.runtime.lastError.message));
+                      else resolve(res);
+                    });
+                  });
+                  
+                  if (response && response.analysis) {
+                    company = response.analysis.company || company;
+                    title = response.analysis.title || title;
+                    console.log(`[Job Applier PRO] AI Refined: ${company} - ${title}`);
+                  }
+                } catch (e) {
+                  console.warn('[Job Applier PRO] AI Analysis skipped:', e.message);
+                }
+              }
+
               leadsFound.push({
                 email: lowerEmail,
                 company: company,
@@ -237,7 +263,7 @@
                 id: 'lead_' + Math.random().toString(36).substr(2, 9)
               });
             }
-          });
+          }
         }
       }
 
@@ -380,6 +406,10 @@
   }
 
   async function runSession() {
+    if (!chrome.runtime?.id) {
+      console.log('⚠️ [Job Applier PRO] Extension context invalidated. Stopping session.');
+      return;
+    }
     try {
       const data = await new Promise(r => chrome.storage.local.get(['isScraping', 'currentRole', 'leads'], r));
       if (!data.isScraping) {
@@ -409,6 +439,11 @@
         chrome.runtime.sendMessage({ action: 'scrapingFinished' });
       }
     } catch (err) {
+      if (err.message.includes('Extension context invalidated')) {
+        console.log('🛑 [Job Applier PRO] Context invalidated. Please refresh the page.');
+        updateBanner('Extension updated. Please refresh this page to continue.');
+        return; // Stop everything
+      }
       console.error('[Job Applier PRO] Session Error:', err);
       updateBanner('Error encountered. Retrying in 5s...');
       setTimeout(runSession, 5000);
@@ -417,23 +452,28 @@
 
   // --- Initializer ---
   if (window.location.href.includes('linkedin.com/search/results/content') || window.location.href.includes('linkedin.com/search/results/all')) {
-    chrome.storage.local.get(['isScraping'], async (data) => {
-      if (data.isScraping) {
-        createBanner();
-        updateBanner('Engine Initialized. Waiting for content...');
-        
-        // Wait for results to actually load
-        let attempts = 0;
-        while (attempts < 20) {
-          const results = document.querySelector('.reusable-search__result-container, .feed-shared-update-v2, article');
-          if (results) break;
-          await wait(1000);
-          attempts++;
+    try {
+      chrome.storage.local.get(['isScraping'], async (data) => {
+        if (chrome.runtime.lastError) return; // Silent fail if context invalid
+        if (data.isScraping) {
+          createBanner();
+          updateBanner('Engine Initialized. Waiting for content...');
+          
+          // Wait for results to actually load
+          let attempts = 0;
+          while (attempts < 20) {
+            const results = document.querySelector('.reusable-search__result-container, .feed-shared-update-v2, article');
+            if (results) break;
+            await wait(1000);
+            attempts++;
+          }
+          
+          updateBanner('Content detected. Starting scan...');
+          setTimeout(runSession, 2000);
         }
-        
-        updateBanner('Content detected. Starting scan...');
-        setTimeout(runSession, 2000);
-      }
-    });
+      });
+    } catch (e) {
+      console.log('[Job Applier PRO] Initializer suppressed: Context invalidated.');
+    }
   }
 })();

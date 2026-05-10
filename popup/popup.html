@@ -34,23 +34,31 @@
         </div>
         <div class="input-group">
           <label for="template">Email Template</label>
-          <div class="helper-text">Use {job_title} and {company} as placeholders.</div>
+          <div class="helper-text">Use {job_title}, {company}, and {cv_link} as placeholders.</div>
           <textarea id="template" rows="5" placeholder="Enter your custom message here..."></textarea>
+        </div>
+        <div class="input-group">
+          <label for="cv-link">CV/Resume Link (Google Drive)</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="cv-link" placeholder="https://drive.google.com/..." style="flex: 1;">
+            <a id="open-cv" href="#" target="_blank" class="action-btn" style="display: flex; align-items: center; justify-content: center; text-decoration: none; padding: 0 15px;">Open ↗</a>
+          </div>
         </div>
 
         <!-- AI Config Section -->
         <div class="ai-config-group" style="padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 15px;">
           <div class="input-group">
-            <label for="ai-provider">AI Provider</label>
-            <select id="ai-provider" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: white;">
-              <option value="gemini">Local AI (Gemini Nano)</option>
-              <option value="openai">Cloud AI (ChatGPT)</option>
-            </select>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <label for="use-ai" style="margin-bottom: 0;">Use Gemini Flash AI</label>
+              <input type="checkbox" id="use-ai" style="width: auto; margin: 0;">
+            </div>
+            <div class="helper-text">Enable AI for smarter job analysis & personalized drafts.</div>
           </div>
-          <div id="openai-settings" class="hidden">
+          <div id="gemini-settings">
             <div class="input-group">
-              <label for="openai-key">OpenAI API Key</label>
-              <input type="password" id="openai-key" placeholder="sk-...">
+              <label for="gemini-key">Gemini API Key</label>
+              <input type="password" id="gemini-key" placeholder="Enter your Google AI Key">
+              <div class="helper-text" style="font-size: 0.7rem;">Get it from <a href="https://aistudio.google.com/" target="_blank" style="color: var(--primary);">Google AI Studio</a></div>
             </div>
           </div>
         </div>
@@ -60,6 +68,15 @@
 
       <!-- Scraper Tab -->
       <section id="scraper" class="tab-content">
+        <div class="input-group">
+          <label for="time-filter">Search Results From</label>
+          <select id="time-filter" style="width: 100%; background: var(--glass); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; color: rgb(23, 59, 160);">
+            <option value="past-24h">Past 24 Hours</option>
+            <option value="past-week" selected>Past Week</option>
+            <option value="past-month">Past Month</option>
+            <option value="all">All Time</option>
+          </select>
+        </div>
         <div class="status-card">
           <div class="status-icon">🚀</div>
           <div class="status-info">
@@ -78,8 +95,9 @@
 
       <!-- Results Tab -->
       <section id="results" class="tab-content">
-        <div class="results-header">
-           <button id="clear-leads" class="danger-btn">Clear All Results</button>
+        <div class="results-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+           <span style="font-size: 0.85rem; color: var(--text-dim);">Found <b id="found-count" style="color: var(--primary);">0</b> potential leads</span>
+           <button id="clear-leads" class="danger-btn" style="padding: 6px 12px; font-size: 0.75rem;">Clear All</button>
         </div>
         <div class="table-container">
           <table id="results-table">
