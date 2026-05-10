@@ -3,15 +3,30 @@
 
   const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+(@|\[at\]|\(at\)| @ | at )[a-zA-Z0-9.-]+(\.|\[dot\]|\(dot\)| \. | dot )[a-zA-Z]{2,}/gi;
   let scrollCount = 0;
-  const maxScrolls = 20;
+  const maxScrolls = 100; // Increased for maximum data
   let resultIndex = 0;
 
   // --- Helpers ---
   const wait = (ms) => new Promise(r => setTimeout(r, ms + Math.random() * 500));
 
-  async function humanScroll(distance = 800) {
-    window.scrollBy({ top: distance, behavior: 'smooth' });
-    await wait(2000);
+  async function humanScroll(distance = 1200) {
+    console.log('📜 [Job Applier PRO] Attempting human scroll...');
+    const steps = 6;
+    const stepDistance = distance / steps;
+    
+    for (let i = 0; i < steps; i++) {
+      // Try multiple scroll targets
+      window.scrollBy({ top: stepDistance, behavior: 'smooth' });
+      
+      // Also try to scroll the search results container directly if it exists
+      const searchContainer = document.querySelector('.search-results-container, .scaffold-layout__list-container');
+      if (searchContainer) {
+        searchContainer.scrollTop += stepDistance;
+      }
+
+      await wait(600);
+    }
+    console.log('✅ [Job Applier PRO] Scroll step complete.');
   }
 
   // --- Visible UI ---
@@ -422,13 +437,16 @@
 
       if (scrollCount < maxScrolls) {
         scrollCount++;
+        console.log(`🌊 [Job Applier PRO] Wave ${scrollCount} started.`);
         updateBanner(`Wave ${scrollCount}/${maxScrolls} - Expanding & Scanning...`);
         
         await expandPosts();
+        console.log('🔍 [Job Applier PRO] Posts expanded, starting scrape.');
         await wait(1500);
         await aggressiveScrape(data.currentRole, existingLeads);
         
-        await humanScroll(900);
+        console.log('🚀 [Job Applier PRO] Wave finished, scrolling now...');
+        await humanScroll(1000);
         setTimeout(runSession, 3000);
       } else {
         updateBanner('🏁 Scraping Finished!');
