@@ -26,7 +26,18 @@
       <section id="setup" class="tab-content active">
         <div class="input-group">
           <label for="role">Target Role</label>
-          <input type="text" id="role" placeholder="e.g. Full Stack Developer">
+          <input type="text" id="role" list="role-suggestions" placeholder="e.g. Full Stack Developer">
+          <datalist id="role-suggestions">
+            <option value="Full Stack Developer">
+            <option value="MERN Stack Developer">
+            <option value="Frontend Developer">
+            <option value="Backend Developer">
+            <option value="UI/UX Designer">
+            <option value="Data Analytics">
+            <option value="Software Engineer">
+            <option value="React Developer">
+            <option value="Next.js Developer">
+          </datalist>
         </div>
         <div class="input-group">
           <label for="skills">Skills</label>
